@@ -227,22 +227,24 @@
         </div>
       </div>
     {% endif %}
-    {% form 'product',
-      featured_product,
-      id: featured_product.id,
-      class: 'visually-hidden',
-      data-product-form: '',
-      data-product-handle: featured_product.handle,
-      data-enable-history-state: 'true',
-      data-type: 'add-to-cart-form'
-    %}
-      <input
-        id="product-id"
-        type="hidden"
-        name="id"
-        value="{{ featured_product.selected_or_first_available_variant.id }}"
-      >
-    {% endform %}
+    {% if featured_product != blank %}
+      {% form 'product',
+        featured_product,
+        id: featured_product.id,
+        class: 'visually-hidden',
+        data-product-form: '',
+        data-product-handle: featured_product.handle,
+        data-enable-history-state: 'true',
+        data-type: 'add-to-cart-form'
+      %}
+        <input
+          id="product-id"
+          type="hidden"
+          name="id"
+          value="{{ featured_product.selected_or_first_available_variant.id }}"
+        >
+      {% endform %}
+    {% endif %}
   </best-sellers-section>
 {% endif %}
 
@@ -312,7 +314,7 @@
 
 {% schema %}
 {
-  "name": "t:sections.best-sellers.name",
+  "name": "Best sellers",
   "settings": [
     {
       "type": "text",
@@ -354,7 +356,7 @@
   ],
   "presets": [
     {
-      "name": "t:sections.featured-collection.presets.name"
+      "name": "Best sellers"
     }
   ]
 }
