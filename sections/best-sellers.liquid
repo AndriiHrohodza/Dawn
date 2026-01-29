@@ -1,0 +1,361 @@
+{{ 'best-sellers.css' | asset_url | stylesheet_tag }}
+
+<script src="{{ 'best-sellers.js' | asset_url }}" defer="defer"></script>
+
+{% liquid
+  assign featured_product = null
+
+  for block in section.blocks
+    if block.settings.collection_product != blank
+      assign featured_product = block.settings.collection_product
+      break
+    elsif block.settings.collection != blank
+      assign available_products = block.settings.collection.products | where: 'available', true
+      if available_products.size > 0
+        assign featured_product = available_products.first
+        break
+      endif
+    endif
+  endfor
+
+  assign current_variant = featured_product.selected_or_first_available_variant
+
+  if featured_product.title
+    assign price = featured_product.price
+    assign compare_at_price = featured_product.compare_at_price
+    assign price_varies = featured_product.price_varies
+    assign price_min = featured_product.price_min | money
+  else
+    assign price_default = 1999
+    assign compare_at_price_default = 2999
+  endif
+%}
+
+{% if section.blocks.size > 0 %}
+  <best-sellers-section
+    id="best-sellers-{{ section.id }}"
+    data-section-id="{{ section.id }}"
+    class="trending-section"
+  >
+    <div class="best-sellers__container">
+      <div class="tab-content">
+        {% if section.settings.label != blank or section.settings.title != blank %}
+          <div class="text-wrapper">
+            {% if section.settings.label != blank %}
+              <span class="best-sellers-subtitle">{{ section.settings.label }}</span>
+            {% endif %}
+            {% if section.settings.title != blank %}
+              <h2 class="best-sellers-title">{{ section.settings.title }}</h2>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        {% if section.blocks.size > 0 %}
+          <ul class="category-list">
+            {% for block in section.blocks %}
+              {% liquid
+                assign collection = block.settings.collection
+              %}
+              {% if block.settings.collection != blank or block.settings.collection_product != blank %}
+                <li
+                  id="{{ section.id }}-{{ forloop.index0 }}"
+                  class="category-item"
+                  data-forloop-index="{{ forloop.index0 }}"
+                >
+                  <button
+                    type="button"
+                    class="category-btn {% if forloop.first %}active{% endif %}"
+                    data-index="{{ forloop.index0 }}"
+                    aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+                    role="tab"
+                  >
+                    <span>{{ collection.title | default: 'Collection title' }}</span>
+                    <svg
+                      class="arrow-icon"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                  </button>
+                </li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+
+      {% if featured_product != blank %}
+        <div class="product-card">
+          <div class="product-card__media-wrapper">
+            <a
+              href="{{ featured_product.url }}"
+              class="product-card__link"
+              aria-label="{{ featured_product.title }}"
+            >
+              <div class="product-image-wrapper">
+                {% liquid
+                  assign image = featured_product.featured_media.preview_image
+                %}
+                {% if image != blank %}
+                  <picture>
+                    <source
+                      media="(max-width: 749px)"
+                      srcset="
+                        {{ image | image_url: width: 343 }} 1x,
+                        {{ image | image_url: width: 686 }} 2x
+                      "
+                    >
+                    <source
+                      media="(min-width: 750px)"
+                      srcset="
+                        {{ image | image_url: width: 816 }} 1x,
+                        {{ image | image_url: width: 1632 }} 2x
+                      "
+                    >
+                    <img
+                      src="{{ image | image_url: width: 816 }}"
+                      alt="{{ image.alt | escape }}"
+                      loading="lazy"
+                      width="{{ image.width }}"
+                      height="{{ image.height }}"
+                      style="object-position: {{ image.presentation.focal_point | default: 'center' }};"
+                      class="product-image"
+                    >
+                  </picture>
+                {% else %}
+                  {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                {% endif %}
+              </div>
+            </a>
+
+            {% if featured_product.tags.size > 0 %}
+              <div class="badges">
+                {% for tag in featured_product.tags limit: 3 %}
+                  <span class="badge {{ tag | downcase }}">{{ tag }}</span>
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            <div class="actions">
+              <button class="action-btn wish-list-btn" type="button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+              </button>
+              <button type="submit" name="add" class="action-btn" data-submit-button>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="product-info">
+            <h3 class="product-name">{{ featured_product.title }}</h3>
+            <div class="price-box">
+              {% if price_varies %}
+                <span class="start-from">{{ 'products.product.price.from_price_html' | t: price: price_min }}</span>
+              {% else %}
+                {% if compare_at_price > price %}
+                  <span class="current-price">{{ price | money }}</span>
+                  <del class="old-price">{{ compare_at_price | money }}</del>
+                {% else %}
+                  <span class="price">{{ price | money }}</span>
+                {% endif %}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <div class="product-card">
+          <div class="product-card__media-wrapper">
+            <div class="product-image-wrapper">
+              {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+            </div>
+          </div>
+
+          <div class="badges">
+            <span class="badge new">New</span>
+            <span class="badge sale">Sale</span>
+          </div>
+
+          <div class="actions">
+            <button class="action-btn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+            </button>
+            <button type="submit" name="add" class="action-btn" data-submit-button>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+          </div>
+
+          <div class="product-info">
+            <h3 class="product-name">Your product's name</h3>
+            <div class="price-box">
+              <span class="current-price">{{ price_default | money }}</span>
+              <del class="old-price">{{ compare_at_price_default | money }}</del>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+    {% if featured_product != blank %}
+      <div id="wishlist-modal-{{ section.id }}" class="wishlist-modal" aria-hidden="true">
+        <div class="wishlist-overlay" data-close-modal></div>
+
+        <div class="wishlist-content">
+          <button type="button" class="wishlist-close-btn" data-close-modal>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 6L6 18M6 6l12 12"></path>
+            </svg>
+          </button>
+
+          <div class="wishlist-body">
+            <p class="wishlist-message">{{ featured_product.title }} has been added to your wishlist</p>
+            <a href="/pages/wishlist" class="wishlist-link-btn">View Wishlist</a>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+    {% form 'product',
+      featured_product,
+      id: featured_product.id,
+      class: 'visually-hidden',
+      data-product-form: '',
+      data-product-handle: featured_product.handle,
+      data-enable-history-state: 'true',
+      data-type: 'add-to-cart-form'
+    %}
+      <input
+        id="product-id"
+        type="hidden"
+        name="id"
+        value="{{ featured_product.selected_or_first_available_variant.id }}"
+      >
+    {% endform %}
+  </best-sellers-section>
+{% endif %}
+
+<script type="application/json" id="SectionData-{{ section.id }}">
+  {% assign has_content = false %}
+  [
+    {% for block in section.blocks %}
+      {% assign current_collection = block.settings.collection %}
+      {% assign current_product = block.settings.collection_product %}
+
+
+      {% if current_collection != blank %}
+        {% assign current_collection_products = current_collection.products | where: 'available', true %}
+        {%- if has_content -%},{%- endif -%}
+        {
+          "product": [
+            {% for product in current_collection_products limit: 1 %}
+              {% assign product_price_min = product.price_min | money %}
+              {
+                "id": {{ product.id }},
+                "available": {{ product.available }},
+                "tags": {{ product.tags | json }},
+                "title": {{ product.title | json }},
+                "price_varies": {{ product.price_varies | json }},
+                "start_from": {{ 'products.product.price.from_price_html' | t: price: product_price_min | json }},
+                "price": {{ product.price | money | json }},
+                "compare_at_price": {{ product.compare_at_price | money | json }},
+                "image_data": {
+                  "image": {{ product.featured_media.preview_image | image_url | json }},
+                  "image_alt": {{ product.featured_media.preview_image.alt | json }},
+                  "image_focal_point": {{ product.featured_media.preview_image.presentation.focal_point | default: 'center' | json }}
+                },
+                "url": {{ product.url | json }}
+              }
+            {% endfor %}
+          ]
+        }
+        {% assign has_content = true %}
+      {% elsif current_product != blank %}
+        {% assign current_product_price_min = current_product.price_min | money %}
+        {%- if has_content -%},{%- endif -%}
+        {
+          "product": [
+            {
+              "id": {{ current_product.id }},
+              "available": {{ current_product.available }},
+              "tags": {{ current_product.tags | json }},
+              "title": {{ current_product.title | json }},
+              "price_varies": {{ current_product.price_varies | json }},
+              "start_from": {{ 'products.product.price.from_price_html' | t: price: current_product_price_min | json }},
+              "price": {{ current_product.price | money | json }},
+              "compare_at_price": {{ current_product.compare_at_price | money | json }},
+              "image_data": {
+                "image": {{ current_product.featured_media.preview_image | image_url | json }},
+                "image_alt": {{ current_product.featured_media.preview_image.alt | json }},
+                "image_focal_point": {{ current_product.featured_media.preview_image.presentation.focal_point | default: 'center' | json }}
+              },
+              "url": {{ current_product.url | json }}
+            }
+          ]
+        }
+        {% assign has_content = true %}
+      {% endif %}
+    {% endfor %}
+  ]
+</script>
+
+{% schema %}
+{
+  "name": "t:sections.best-sellers.name",
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "default": "Best sellers",
+      "label": "Label"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "default": "Trending Products",
+      "label": "Title"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "collection",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "text",
+          "id": "collection_title",
+          "default": "Collection Title",
+          "label": "Collection title"
+        },
+        {
+          "type": "product",
+          "id": "collection_product",
+          "label": "Product"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.featured-collection.presets.name"
+    }
+  ]
+}
+{% endschema %}

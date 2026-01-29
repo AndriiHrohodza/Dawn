@@ -1,0 +1,496 @@
+/* Контейнер */
+.trending-section {
+  padding: 32px 16px;
+  width: 100%;
+  background-color: transparent;
+}
+
+.trending-section .best-sellers__container {
+  max-width: 1648px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 816px 816px;
+  gap: 16px;
+  align-items: center;
+}
+
+.trending-section .tab-content {
+  display: flex;
+  flex-direction: column;
+  max-width: 816px;
+  padding: 0px 64px;
+  align-self: center;
+}
+
+.tab-content .text-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 86px;
+  margin-bottom: 64px;
+}
+
+.text-wrapper .best-sellers-subtitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  color: #535353;
+  height: 24px;
+}
+
+.text-wrapper .best-sellers-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 38px;
+  font-weight: 500;
+  line-height: 1.1;
+  height: 46px;
+  color: #000000;
+  margin: 16px 0px 0px 0px;
+}
+
+.trending-section .category-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 246px;
+}
+
+/* 1. Скидаємо стандартні стилі кнопки та задаємо базу */
+.trending-section .category-btn {
+  /* Reset browser styles */
+  appearance: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  /* Кнопка на всю ширину контейнера */
+
+  /* Flexbox (як було у тебе) */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  /* Відступи та лінія */
+  padding: 24px;
+  border-bottom: 1px dotted #D1D1D1;
+  /* Базова пунктирна лінія */
+
+  /* Типографіка */
+  text-decoration: none;
+  color: #000000;
+  font-family: inherit;
+  /* Важливо: успадкувати шрифт теми */
+  font-size: 28px;
+  font-weight: 500;
+  text-align: left;
+
+  /* Плавність */
+  transition: color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+}
+
+.category-btn span {
+  height: 34px;
+}
+
+/* 2. ЕФЕКТ "ФОКУСУ" (Sibling Fade) */
+/* Коли ми наводимо на список — ВСІ кнопки тьмяніють */
+.trending-section .category-list:hover .category-btn {
+  opacity: 0.4;
+}
+
+/* 3. ВИНЯТКИ (Хто має бути яскравим?) */
+/* Яскравою залишається:
+   а) Кнопка, на яку навели (.category-btn:hover)
+   б) Кнопка, яка вже активна (.category-btn.active)
+*/
+.trending-section .category-list:hover .category-btn:hover,
+.trending-section .category-list:hover {
+  opacity: 1;
+}
+
+/* 4. СТИЛІ АКТИВНОГО СТАНУ ТА HOVER */
+/* Це застосовується і коли навели мишку, і коли елемент вибраний */
+.trending-section .category-btn:hover,
+.trending-section {
+  color: #000000;
+  border-bottom: 1px solid #292929;
+  /* Твоя суцільна лінія */
+  opacity: 1;
+  /* Гарантуємо видимість активного елемента навіть без наведення */
+}
+
+.trending-section .category-btn:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
+.trending-section .product-card {
+  position: relative;
+  width: 100%;
+  /* На десктопі фіксуємо, на мобайлі розтягуємо */
+  max-width: 816px;
+  aspect-ratio: 1 / 1;
+  /* ГАРАНТІЯ квадрата незалежно від контенту */
+  border-radius: 16px;
+  overflow: hidden;
+  display: block;
+}
+
+.trending-section .product-image-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.trending-section .product-image-wrapper picture,
+.trending-section .product-image-wrapper img {
+  margin: 0 !important;
+  padding: 0 !important;
+  /* width: 100%;
+  object-fit: cover;
+  object-position: center center; */
+}
+
+.trending-section .product-image-wrapper img {
+  width: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+
+.trending-section .product-image {
+  /* object-fit: cover — це єдиний спосіб заповнити КВАДРАТ картинкою будь-якої пропорції без деформації */
+  /* object-fit: cover !important; */
+  /* object-position буде братися з твого Liquid (Focal Point) */
+}
+
+.trending-section .badges {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 2;
+}
+
+.trending-section .badge {
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.trending-section .badge {
+  background-color: #fff;
+  color: #000;
+}
+
+.trending-section .badge.sale {
+  background-color: #d32f2f;
+  color: #fff;
+}
+
+.trending-section .actions {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 2;
+}
+
+.trending-section .action-btn {
+  width: 48px;
+  height: 48px;
+  background-color: #fff;
+  border: none;
+  border-radius: 10px;
+  /* Більш квадратні з макету */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s;
+}
+
+.trending-section .action-btn:hover {
+  transform: scale(1.05);
+  background-color: #fff;
+}
+
+.trending-section .product-info {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  background-color: #fff;
+  padding: 24px 32px;
+  margin-bottom: 16px;
+  border-radius: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  z-index: 3;
+}
+
+.trending-section .product-name {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: #121212;
+  margin: 0;
+}
+
+.trending-section .price-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Inter', sans-serif;
+}
+
+.trending-section .price-box .start-from {
+  font-size: 16px;
+  font-family: 'Inter', sans-serif;
+}
+
+.trending-section .current-price {
+  font-size: 16px;
+  font-weight: 600;
+  color: #E41616;
+}
+
+.trending-section .old-price {
+  font-size: 16px;
+  text-decoration: line-through;
+  color: #9D9D9D;
+  font-weight: 400;
+}
+
+body.modal-open {
+  overflow: hidden;
+  height: 100vh;
+}
+
+.wishlist-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.wishlist-modal.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.wishlist-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+}
+
+.wishlist-content {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 450px;
+  background: #ffffff;
+  padding: 40px 24px;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  transform: translateY(20px);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.wishlist-modal.is-open .wishlist-content {
+  transform: translateY(0);
+}
+
+.wishlist-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #757575;
+  transition: color 0.2s;
+  padding: 4px;
+}
+
+.wishlist-close-btn:hover {
+  color: #000;
+}
+
+.wishlist-message {
+  font-family: 'Inter', sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+  color: #000;
+  margin-bottom: 24px;
+}
+
+.wishlist-link-btn {
+  display: inline-block;
+  text-decoration: none;
+  background: #000;
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.wishlist-link-btn:hover {
+  background: #333;
+}
+
+@media (max-width: 990px) {
+  .trending-section {
+    padding: 0px;
+    margin: 64px;
+  }
+
+  .trending-section .best-sellers__container {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 0;
+    max-width: 343px;
+    display: grid;
+    align-items: center;
+  }
+
+  .trending-section .tab-content {
+    max-width: 343px;
+    padding: 0;
+    gap: 24px;
+  }
+
+  .tab-content .text-wrapper {
+    height: auto;
+    margin-bottom: 0;
+    gap: 16px;
+  }
+
+  .text-wrapper .best-sellers-subtitle {
+    font-weight: 400;
+    line-height: 24px;
+  }
+
+  .text-wrapper .best-sellers-title {
+    font-size: 28px;
+    line-height: 34px;
+    height: auto;
+    margin: 0;
+  }
+
+  .trending-section .category-list {
+    max-height: 228px;
+  }
+
+  .trending-section .category-btn {
+    height: 76px;
+    padding: 24px 0;
+    gap: 16px;
+    background: #FFFFFF;
+    border-bottom: 1px solid #DCDCDC;
+    font-family: 'Inter', sans-serif;
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 28px;
+  }
+
+  .category-btn span {
+    height: auto;
+  }
+
+  .trending-section .product-card {
+    /* На мобілці вона має бути на всю ширину, яку дозволяє падінг контейнера */
+    align-self: start !important;
+    max-width: 343px;
+    width: 100%;
+    height: auto;
+    min-height: 0 !important;
+    /* Висоту вирахує aspect-ratio */
+    aspect-ratio: 1 / 1;
+    margin-bottom: 32px;
+  }
+
+  .product-card .product-card__media-wrapper {
+    height: 100%;
+  }
+
+  .product-card .product-card__media-wrapper .product-image-wrapper {
+    height: 100% !important;
+    position: relative !important;
+  }
+
+  .trending-section .badges {
+    top: 8px;
+    left: 8px;
+  }
+
+  .trending-section .actions {
+    top: 8px;
+    right: 8px;
+    gap: 4px;
+    width: 40px;
+  }
+
+  .trending-section .action-btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .trending-section .product-info {
+    top: 257px;
+    left: 8px;
+    right: 8px;
+    bottom: auto;
+    padding: 12px 16px;
+    margin-bottom: 0;
+    height: 80px;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 8px;
+    box-shadow: none;
+  }
+
+  .trending-section .product-name {
+    line-height: 24px;
+    color: #000000;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .trending-section .price-box {
+    height: 24px;
+  }
+}
+
+/* Десктопний ліміт, щоб вона не була більшою за 816px */
+@media (min-width: 991px) {
+  .trending-section .product-card {
+    width: 816px;
+    height: 816px;
+  }
+}
